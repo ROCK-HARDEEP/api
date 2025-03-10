@@ -145,34 +145,6 @@ def format_streaming_chunk(chunk, category):
             return f"```{language}\n"
     return chunk
 
-def custom_response(user_input):
-    lower_input = user_input.lower()
-    if "model" in lower_input or "name" in lower_input:
-        return "IND ChatAI"
-    elif "company" in lower_input:
-        return "Scube Innovation"
-    elif "who developed you" in lower_input or "who created you" in lower_input or "your developer" in lower_input or "who made you" in lower_input:
-        return "I was developed by RMH at Scube Innovation."
-    elif "who is rmh" in lower_input:
-        return "RMH is my developer at Scube Innovation."
-    return None
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.json
-    user_input = data.get("message", "")
-    
-    # Check for predefined responses
-    custom_reply = custom_response(user_input)
-    if custom_reply:
-        return jsonify({"response": custom_reply})
-    
-    # Get response from Gemini API
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(user_input)
-    return jsonify({"response": response.text})
-
-
 # --- Routes ---
 @app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>')
