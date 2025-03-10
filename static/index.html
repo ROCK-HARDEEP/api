@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RM AI Assistant</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- <link rel="stylesheet" href="css/code-blocks.css">  (You can remove this line if you are not using a separate code-blocks.css) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"> <!-- Using github.min.css - a light theme, adjust if needed -->
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="app-title">RM Assistant</h1>
+        <button id="new-chat-btn" class="new-chat-btn">
+          <i class="fas fa-plus"></i> New Chat
+        </button>
+      </div>
+      <div class="conversations">
+        <ul id="conversations-list"></ul>
+      </div>
+      <!-- Sidebar Footer Removed as per Google AI Studio Style -->
+    </aside>
+    <main class="main-content">
+      <div class="chat-header">
+        <div class="category-selector">
+          <label for="category-select"><i class="fas fa-robot"></i> Assistant Type:</label>
+          <select id="category-select">
+            <option value="general">General Assistant</option>
+            <option value="math">Math Expert</option>
+            <option value="coding">Code Assistant</option>
+            <option value="philosophy">Deep Thinker</option>
+          </select>
+        </div>
+      </div>
+      <div id="chat-container" class="chat-container">
+        <div id="welcome-message" class="welcome-message">
+          <h2>Welcome to RM AI Assistant</h2>
+          <p>I'm here to help with your questions and tasks. Choose an assistant type and start chatting!</p>
+        </div>
+      </div>
+      <div class="input-container">
+        <textarea id="user-input" placeholder="Type your message here..." rows="1"></textarea>
+        <button id="send-btn" class="send-btn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <template id="user-message-template">
+    <div class="message user-message">
+      <div class="message-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="message-content">
+        <div class="message-text"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="bot-message-template">
+    <div class="message bot-message">
+      <div class="message-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="message-content">
+        <div class="message-text"></div> <!---- Regular message text goes here -->
+        <div class="code-display-area"></div> <!---- Separate code area -->
+        <div class="message-source"></div>
+        <div class="message-footer"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="loading-template">
+    <div class="message bot-message loading">
+      <div class="message-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="message-content">
+        <div class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/main.js"></script>
+  <!-- <script src="js/formatting.js"></script> (Include this if you are using formatting.js) -->
+</body>
+</html>

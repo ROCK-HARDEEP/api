@@ -1,0 +1,861 @@
+/* Black Theme RM AI Assistant Styles - Claude Inspired with Animations */
+/* style.css for Black Theme, Claude-like look and ChatGPT coding space + Animations */
+
+:root {
+  /* ** Dark Theme Colors - Claude Inspired Black ** */
+  --primary-color: #a8b2ba; /* Muted primary color, like Claude's text but lighter for dark theme */
+  --primary-light: #c0c8cf;
+  --primary-dark: #7d878e;
+  --text-color: #e0e0e0; /* Light text for black background */
+  --light-text: #9e9e9e; /* Slightly darker light text */
+  --background-color: #121212; /* Very dark background */
+  --chat-bg: #1e1e1e; /* Darker chat area background */
+  --border-color: #303030; /* Dark gray borders */
+  --error-color: #f44336; /* Red error color */
+
+  /* Category colors - Muted and distinct for dark theme */
+  --general-color: #9575cd; /* Indigo, muted and lighter */
+  --math-color: #64b5f6; /* Blue, muted and lighter */
+  --coding-color: #81c784; /* Green, muted and lighter */
+  --philosophy-color: #e57373; /* Red, muted and lighter */
+
+  /* Code highlighting colors - Adjusted for black theme */
+  --code-bg: #282828; /* Dark code background */
+  --code-text: #f8f8f8; /* Light code text */
+  --code-keyword: #c792ea; /* Purple keyword - keep same for contrast */
+  --code-function: #ffb340; /* Orange-yellow function - keep same */
+  --code-string: #9ccc65; /* Green string - keep same */
+  --code-number: #ff7043; /* Orange number - keep same */
+  --code-comment: #757575; /* Darker gray comment */
+  --code-variable: #29b6f6; /* Light blue variable - keep same */
+
+  /* Shadows - Even more subtle for dark theme */
+  --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.1); /* Even lighter shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 6px 8px rgba(0, 0, 0, 0.3);
+
+  /* Neon glow - Removed */
+  --neon-glow: transparent;
+  --neon-shadow: none;
+
+  /* Transitions */
+  --transition-fast: all 0.2s ease;
+  --transition: all 0.3s ease;
+
+  /* Spacing - Keep as is */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Border radius */
+  --radius-sm: 0.2rem;
+  --radius: 0.4rem;
+  --radius-md: 0.6rem;
+  --radius-lg: 0.8rem;
+  --radius-full: 9999px;
+}
+
+/* Basic resets and font */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.5s ease, color 0.5s ease; /* Theme transition */
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar - Simplified Claude-like - Dark Theme */
+.sidebar {
+  width: 240px;
+  background-color: var(--chat-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  transition: var(--transition), background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+  z-index: 10;
+}
+
+.sidebar-header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+  transition: border-color 0.5s ease; /* Theme transition */
+}
+
+/* RM Logo -  Less prominent, no neon - Dark Theme */
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: var(--space-4);
+  text-shadow: none;
+  animation: none;
+  transition: color 0.5s ease; /* Theme transition */
+}
+
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--primary-color);
+  color: var(--chat-bg); /* Button text in dark theme is chat background */
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: var(--transition), background-color 0.5s ease, color 0.5s ease, box-shadow 0.3s ease; /* Theme transition */
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  animation: button-pulse 2s infinite; /* Add button pulse animation */
+}
+
+@keyframes button-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.new-chat-btn:hover {
+  background-color: var(--primary-light);
+  box-shadow: var(--shadow-sm);
+  transform: scale(1.03); /* Hover scale up for button */
+}
+
+.new-chat-btn i {
+  margin-right: var(--space-2);
+}
+
+.conversations {
+  flex: 1;
+  padding: var(--space-3);
+}
+
+.conversations h3 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--light-text);
+  margin-bottom: var(--space-3);
+  transition: color 0.5s ease; /* Theme transition */
+}
+
+.conversation-item {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-1);
+  cursor: pointer;
+  transition: var(--transition), background-color 0.5s ease, color 0.5s ease; /* Theme transition */
+  color: var(--light-text);
+  position: relative;
+  font-size: 0.85rem;
+}
+
+.conversation-item:hover {
+  background-color: rgba(255, 255, 255, 0.05); /* Lighter hover for dark theme */
+}
+
+.conversation-item.active {
+  background-color: rgba(255, 255, 255, 0.1); /* Lighter active for dark theme */
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.conversation-title {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.conversation-title i {
+  margin-right: var(--space-2);
+  font-size: 0.75rem;
+}
+
+.conversation-meta {
+  font-size: 0.7rem;
+  color: var(--light-text);
+  transition: color 0.5s ease; /* Theme transition */
+}
+
+.delete-chat-btn {
+  position: absolute;
+  right: var(--space-1);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--light-text);
+  opacity: 0;
+  transition: var(--transition), color 0.5s ease; /* Theme transition */
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.conversation-item:hover .delete-chat-btn {
+  opacity: 1;
+}
+
+.delete-chat-btn:hover {
+  color: var(--error-color);
+}
+
+.sidebar-footer {
+  padding: var(--space-3);
+  border-top: 1px solid var(--border-color);
+  transition: border-color 0.5s ease; /* Theme transition */
+}
+
+.footer-link {
+  color: var(--light-text);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  transition: var(--transition), color 0.5s ease; /* Theme transition */
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--primary-color);
+}
+
+/* Main Content - Dark Theme */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.chat-header {
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--chat-bg);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 5;
+  transition: background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+}
+
+.category-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.category-selector label {
+  font-size: 0.8rem;
+  color: var(--light-text);
+  transition: color 0.5s ease; /* Theme transition */
+}
+
+.category-selector select {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+}
+
+.chat-container {
+  flex: 1;
+  padding: var(--space-4);
+  overflow-y: auto;
+  background-color: var(--background-color);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  scroll-behavior: smooth;
+  transition: background-color 0.5s ease; /* Theme transition */
+}
+
+.welcome-message {
+  text-align: center;
+  max-width: 700px;
+  margin: var(--space-10) auto;
+  padding: var(--space-4);
+  background-color: var(--chat-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+  animation: welcome-fade-in 1s ease-out; /* Welcome message fade in */
+}
+
+@keyframes welcome-fade-in {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+
+.welcome-message h2 {
+  color: var(--primary-color);
+  margin-bottom: var(--space-3);
+  font-size: 1.3rem;
+  transition: color 0.5s ease; /* Theme transition */
+}
+
+.message {
+  display: flex;
+  margin-bottom: var(--space-6);
+  width: 100%;
+  align-items: flex-start;
+  opacity: 0; /* Initial opacity for message animation */
+  transform: translateY(20px); /* Initial position for message animation */
+  animation: message-slide-up 0.5s forwards ease-out; /* Message slide up animation */
+  animation-delay: calc(var(--message-index) * 0.1s); /* Stagger animation */
+}
+
+@keyframes message-slide-up {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--chat-bg); /* Avatar icon color is chat background */
+  margin-right: var(--space-4);
+  box-shadow: none;
+  font-size: 0.9rem;
+  transition: background-color 0.5s ease, color 0.5s ease; /* Theme transition */
+  animation: avatar-pulse 2s infinite alternate; /* Add avatar pulse animation */
+}
+
+@keyframes avatar-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+
+.user-message .message-avatar {
+  background-color: #424242; /* Darker user avatar for dark theme */
+  color: var(--primary-color);
+  box-shadow: none;
+}
+
+.message.category-general .message-avatar { background-color: var(--general-color); }
+.message.category-math .message-avatar { background-color: var(--math-color); }
+.message.category-coding .message-avatar { background-color: var(--coding-color); }
+.message.category-philosophy .message-avatar { background-color: var(--philosophy-color); }
+
+.message-content {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.message-text {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background-color: var(--chat-bg);
+  box-shadow: var(--shadow-xs);
+  font-size: 1rem;
+  line-height: 1.6;
+  border: 1px solid var(--border-color);
+  transition: var(--transition-fast), background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.message-text:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.user-message .message-text {
+  background-color: #2a2a2a; /* Darker user message background for dark theme */
+  border: 1px solid var(--border-color);
+}
+
+.streaming-message .message-text {
+  white-space: pre-wrap;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.streaming-message .cursor {
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  background-color: var(--primary-color);
+  margin-left: 1px;
+  vertical-align: middle;
+  animation: cursor-blink 1s infinite, cursor-fade 1.5s infinite alternate; /* Cursor fade animation */
+}
+
+@keyframes cursor-fade {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+
+@keyframes cursor-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+body.category-general .streaming-message .cursor { background-color: var(--general-color); }
+body.category-math .streaming-message .cursor { background-color: var(--math-color); }
+body.category-coding .streaming-message .cursor { background-color: var(--coding-color); }
+body.category-philosophy .streaming-message .cursor { background-color: var(--philosophy-color); }
+
+.input-container {
+  padding: var(--space-4);
+  background-color: var(--chat-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  position: relative;
+  z-index: 5;
+  transition: background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+}
+
+#user-input {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  resize: none;
+  max-height: 150px;
+  min-height: 48px;
+  box-shadow: var(--shadow-xs);
+  margin-right: var(--space-2);
+  font-size: 1rem;
+  line-height: 1.5;
+  overflow-y: auto;
+  transition: background-color 0.5s ease, color 0.5s ease; /* Theme transition */
+}
+
+#user-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.send-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary-color);
+  color: var(--chat-bg); /* Send button text in dark theme is chat bg */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition), background-color 0.5s ease, box-shadow 0.3s ease, transform 0.3s ease; /* Theme transition */
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.send-btn:hover:not(:disabled) {
+  background-color: var(--primary-light);
+  transform: scale(1.03);
+  box-shadow: var(--shadow-sm);
+}
+
+.send-btn:disabled {
+  background-color: var(--border-color);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+body.category-general .send-btn { background-color: var(--general-color); }
+body.category-math .send-btn { background-color: var(--math-color); }
+body.category-coding .send-btn { background-color: var(--coding-color); }
+body.category-philosophy .send-btn { background-color: var(--philosophy-color); }
+
+/* Scrollbar - Lighter for dark theme */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color); /* Lighter hover for dark theme */
+}
+
+/* Enhanced Code Block Styling - Dark theme */
+.code-block-wrapper {
+  position: relative;
+  margin: 1rem 0;
+  border-radius: var(--radius);
+  background-color: var(--code-bg) !important; /* Dark code background */
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  width: 100%;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+}
+
+.code-block-wrapper code {
+  font-family: 'Fira Code', 'Roboto Mono', monospace;
+  padding: 1.2rem 0.8rem 0.8rem !important;
+  white-space: pre;
+  tab-size: 2;
+  display: block;
+  overflow-x: auto;
+  background-color: transparent !important;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--code-text); /* Light code text */
+}
+
+
+/* Line numbers styling */
+.code-block-wrapper.with-line-numbers {
+  counter-reset: line;
+  padding-left: 3em;
+  position: relative;
+}
+
+.code-block-wrapper.with-line-numbers::before {
+  content: '';
+  position: absolute;
+  left: 2.5em;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--border-color);
+  transition: background-color 0.5s ease; /* Theme transition */
+}
+
+.code-block-wrapper.with-line-numbers code .line {
+  display: block;
+  position: relative;
+  line-height: 1.5;
+}
+
+.code-block-wrapper.with-line-numbers code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  position: absolute;
+  left: -2.5em;
+  width: 2em;
+  text-align: right;
+  color: var(--light-text);
+  padding-right: 0.3rem;
+  font-size: 0.8rem;
+  transition: color 0.5s ease; /* Theme transition */
+}
+
+.code-language-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  background-color: rgba(255, 255, 255, 0.05); /* Lighter badge bg for dark theme */
+  color: var(--light-text);
+  border-bottom-left-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  z-index: 5;
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease; /* Theme transition */
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 0.2rem;
+  right: 2.8rem;
+  padding: 0.1rem 0.4rem;
+  background-color: rgba(255, 255, 255, 0.05); /* Lighter button bg for dark theme */
+  color: var(--light-text);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.7rem;
+  transition: var(--transition), background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease; /* Theme transition */
+  z-index: 5;
+}
+
+.copy-code-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Slightly darker hover for dark theme */
+  color: var(--primary-light); /* Lighter hover color for dark theme */
+  border-color: var(--primary-light);
+}
+
+/* Tooltip for copy button */
+.copy-code-btn[data-tooltip]:hover:after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -1.5rem;
+  right: 0;
+  padding: 0.1rem 0.3rem;
+  background-color: rgba(0, 0, 0, 0.8); /* Darker tooltip bg for dark theme */
+  color: rgb(49, 47, 47);
+  border-radius: var(--radius-sm);
+  font-size: 0.6rem;
+  white-space: nowrap;
+}
+
+/* Streaming code formatting - Dark theme */
+.streaming-code {
+  font-family: 'Fira Code', 'Roboto Mono', monospace;
+  background-color: var(--code-bg); /* Dark streaming code background */
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  margin: 1rem 0;
+  position: relative;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--code-text); /* Light streaming code text */
+  box-shadow: var(--shadow-xs);
+  width: 100%;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.5s ease, border-color 0.5s ease; /* Theme transition */
+}
+
+.code-language {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  background-color: rgba(255, 255, 255, 0.05); /* Lighter badge background for dark theme */
+  color: var(--light-text);
+  border-bottom-left-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  z-index: 5;
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease; /* Theme transition */
+}
+
+/* Enhanced syntax highlighting colors - Dark theme - mostly keep same as syntax highlighting already works well in dark */
+.hljs-keyword {
+  color: var(--code-keyword);
+}
+
+.hljs-function {
+  color: var(--code-function);
+}
+
+.hljs-string {
+  color: var(--code-string);
+}
+
+.hljs-number {
+  color: var(--code-number);
+}
+
+.hljs-comment {
+  color: var(--code-comment);
+}
+
+.hljs-variable {
+  color: var(--code-variable);
+}
+
+.hljs-operator {
+  color: var(--code-keyword);
+}
+
+.hljs-attribute {
+  color: var(--code-variable);
+}
+
+.hljs-built_in {
+  color: var(--code-keyword);
+}
+
+.hljs-selector-tag {
+  color: var(--code-function);
+}
+
+.hljs-section {
+  color: var(--code-function);
+}
+
+.hljs-link {
+  color: var(--code-keyword);
+}
+
+.hljs-title {
+  color: var(--code-function);
+}
+
+.hljs-type {
+  color: var(--code-variable);
+}
+
+.hljs-name {
+  color: var(--code-keyword);
+}
+
+.hljs-tag {
+  color: var(--code-keyword);
+}
+
+.hljs-attr {
+  color: var(--code-function);
+}
+
+/* Fix for multi-code block alignment */
+.message-text pre {
+  margin: 0;
+  width: 100%;
+}
+
+.message-text pre:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+/* Message footer for copy buttons - Dark theme */
+.message-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.3rem;
+  padding: 0 0.3rem;
+}
+
+.message-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.copy-message-btn {
+  background: none;
+  border: none;
+  color: var(--light-text);
+  cursor: pointer;
+  padding: 0.15rem;
+  border-radius: var(--radius-sm);
+  opacity: 0.4;
+  transition: var(--transition), color 0.5s ease; /* Theme transition */
+  font-size: 0.7rem;
+}
+
+.message:hover .copy-message-btn {
+  opacity: 0.8;
+}
+
+.copy-message-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05); /* Lighter button hover for dark theme */
+  color: var(--primary-light);
+}
+
+/* Fix for streaming cursor - Smaller cursor */
+.streaming-message .cursor {
+  display: inline-block;
+  width: 5px;
+  height: 12px;
+  background-color: var(--primary-color);
+  margin-left: 1px;
+  vertical-align: middle;
+  animation: cursor-blink 1s infinite, cursor-fade 1.5s infinite alternate;
+}
+
+
+/* Ensure code blocks in multi-block messages have consistent height */
+.message-text pre.code-block-wrapper {
+  max-height: 350px;
+  overflow: auto;
+}
+
+/* Fix for long lines in code blocks */
+.code-block-wrapper code {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Prevent code blocks from overflowing message container */
+.message-content {
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Line number spacing fix */
+.code-block-wrapper.with-line-numbers code {
+  display: block;
+  padding-left: 0 !important;
+}
+
+/* Ensure proper spacing between multiple code blocks */
+.message-text > pre.code-block-wrapper + pre.code-block-wrapper {
+  margin-top: 15px;
+}
+
+/* Fix for code highlighting in multiple blocks */
+.message-text pre code.hljs {
+  background-color: transparent !important;
+}
+
+/* Mobile optimization for code blocks */
+@media (max-width: 768px) {
+  .code-block-wrapper code {
+    font-size: 0.8rem;
+  }
+
+  .code-block-wrapper.with-line-numbers {
+    padding-left: 2.5em;
+  }
+
+  .code-block-wrapper.with-line-numbers::before {
+    left: 2em;
+  }
+
+  .code-block-wrapper.with-line-numbers code .line::before {
+    left: -2.5em;
+    width: 2em;
+    font-size: 0.7rem;
+  }
+
+  .copy-code-btn {
+    right: 2.5rem;
+  }
+}

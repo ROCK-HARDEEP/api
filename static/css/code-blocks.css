@@ -1,0 +1,320 @@
+/* Enhanced Code Block Styling */
+.code-block-wrapper {
+    position: relative;
+    margin: 1rem 0;
+    border-radius: var(--radius);
+    background-color: #1e1e2e !important;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: block;
+    width: 100%;
+  }
+  
+  .code-block-wrapper code {
+    font-family: 'Fira Code', 'Roboto Mono', monospace;
+    padding: 1.5rem 1rem 1rem !important;
+    white-space: pre;
+    tab-size: 2;
+    display: block;
+    overflow-x: auto;
+    background-color: transparent !important;
+    line-height: 1.5;
+    color: #f8f8f2;
+  }
+  
+  /* Line numbers styling */
+  .code-block-wrapper.with-line-numbers {
+    counter-reset: line;
+    padding-left: 3.5em;
+    position: relative;
+  }
+  
+  .code-block-wrapper.with-line-numbers::before {
+    content: '';
+    position: absolute;
+    left: 3em;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .code-block-wrapper.with-line-numbers code .line {
+    display: block;
+    position: relative;
+    line-height: 1.5;
+  }
+  
+  .code-block-wrapper.with-line-numbers code .line::before {
+    counter-increment: line;
+    content: counter(line);
+    position: absolute;
+    left: -3em;
+    width: 2.5em;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.3);
+    padding-right: 0.5em;
+  }
+  
+  .code-language-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(45, 45, 60, 0.9);
+    color: #aaa;
+    border-bottom-left-radius: var(--radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 5;
+  }
+  
+  .copy-code-btn {
+    position: absolute;
+    top: 0.3rem;
+    right: 3.5rem;
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(45, 45, 60, 0.9);
+    color: #aaa;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: var(--transition);
+    z-index: 5;
+  }
+  
+  .copy-code-btn:hover {
+    background-color: rgba(76, 86, 106, 0.8);
+    color: white;
+  }
+  
+  /* Tooltip for copy button */
+  .copy-code-btn[data-tooltip]:hover:after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -1.8rem;
+    right: 0;
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  
+  /* Streaming code formatting */
+  .streaming-code {
+    font-family: 'Fira Code', 'Roboto Mono', monospace;
+    background-color: #1e1e2e;
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin: 1rem 0;
+    position: relative;
+    overflow-x: auto;
+    white-space: pre;
+    color: #f8f8f2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    width: 100%;
+  }
+  
+  .code-language {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(45, 45, 60, 0.9);
+    color: #aaa;
+    border-bottom-left-radius: var(--radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Enhanced syntax highlighting colors */
+  .hljs-keyword {
+    color: #ff79c6;
+  }
+  
+  .hljs-function {
+    color: #50fa7b;
+  }
+  
+  .hljs-string {
+    color: #f1fa8c;
+  }
+  
+  .hljs-number {
+    color: #bd93f9;
+  }
+  
+  .hljs-comment {
+    color: #6272a4;
+  }
+  
+  .hljs-variable {
+    color: #8be9fd;
+  }
+  
+  .hljs-operator {
+    color: #ff79c6;
+  }
+  
+  .hljs-attribute {
+    color: #8be9fd;
+  }
+  
+  .hljs-built_in {
+    color: #ff79c6;
+  }
+  
+  .hljs-selector-tag {
+    color: #50fa7b;
+  }
+  
+  .hljs-section {
+    color: #50fa7b;
+  }
+  
+  .hljs-link {
+    color: #ff79c6;
+  }
+  
+  .hljs-title {
+    color: #50fa7b;
+  }
+  
+  .hljs-type {
+    color: #8be9fd;
+  }
+  
+  .hljs-name {
+    color: #ff79c6;
+  }
+  
+  .hljs-tag {
+    color: #ff79c6;
+  }
+  
+  .hljs-attr {
+    color: #50fa7b;
+  }
+  
+  /* Fix for multi-code block alignment */
+  .message-text pre {
+    margin: 0;
+    width: 100%;
+  }
+  
+  .message-text pre:not(:last-child) {
+    margin-bottom: 20px;
+  }
+  
+  /* Message footer for copy buttons */
+  .message-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0 0.5rem;
+  }
+  
+  .message-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .copy-message-btn {
+    background: none;
+    border: none;
+    color: var(--light-text);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    opacity: 0.5;
+    transition: var(--transition);
+  }
+  
+  .message:hover .copy-message-btn {
+    opacity: 1;
+  }
+  
+  .copy-message-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Fix for streaming cursor */
+  .streaming-message .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background-color: var(--primary-color);
+    margin-left: 1px;
+    vertical-align: middle;
+    animation: cursor-blink 1s infinite;
+  }
+  
+  @keyframes cursor-blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  /* Ensure code blocks in multi-block messages have consistent height */
+  .message-text pre.code-block-wrapper {
+    max-height: 400px;
+    overflow: auto;
+  }
+  
+  /* Fix for long lines in code blocks */
+  .code-block-wrapper code {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* Prevent code blocks from overflowing message container */
+  .message-content {
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  /* Line number spacing fix */
+  .code-block-wrapper.with-line-numbers code {
+    display: block;
+    padding-left: 0 !important;
+  }
+  
+  /* Ensure proper spacing between multiple code blocks */
+  .message-text > pre.code-block-wrapper + pre.code-block-wrapper {
+    margin-top: 20px;
+  }
+  
+  /* Fix for code highlighting in multiple blocks */
+  .message-text pre code.hljs {
+    background-color: transparent !important;
+  }
+  
+  /* Mobile optimization for code blocks */
+  @media (max-width: 768px) {
+    .code-block-wrapper code {
+      font-size: 0.85rem;
+    }
+    
+    .code-block-wrapper.with-line-numbers {
+      padding-left: 2.5em;
+    }
+    
+    .code-block-wrapper.with-line-numbers::before {
+      left: 2em;
+    }
+    
+    .code-block-wrapper.with-line-numbers code .line::before {
+      left: -2.5em;
+      width: 2em;
+    }
+    
+    .copy-code-btn {
+      right: 2.5rem;
+    }
+  }

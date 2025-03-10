@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose RM Assistant Type</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="category-selection">
+    <h1>Choose RM Assistant Type</h1>
+    <p>Select the type of assistant that best fits your needs. Each assistant is specialized to help with different types of questions.</p>
+    
+    <div class="category-grid">
+      <div class="category-card category-general" onclick="selectCategory('general')">
+        <i class="fas fa-robot"></i>
+        <h3>General Assistant</h3>
+        <p>All-purpose AI that can help with a wide range of topics and questions.</p>
+      </div>
+      
+      <div class="category-card category-math" onclick="selectCategory('math')">
+        <i class="fas fa-calculator"></i>
+        <h3>Math Expert</h3>
+        <p>Specialized in solving mathematical problems with step-by-step solutions.</p>
+      </div>
+      
+      <div class="category-card category-coding" onclick="selectCategory('coding')">
+        <i class="fas fa-code"></i>
+        <h3>Code Assistant</h3>
+        <p>Helps with programming, debugging, and software development questions.</p>
+      </div>
+      
+      <div class="category-card category-philosophy" onclick="selectCategory('philosophy')">
+        <i class="fas fa-brain"></i>
+        <h3>Deep Thinker</h3>
+        <p>Explores philosophical concepts, ethics, and complex ideas with depth.</p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function selectCategory(category) {
+      // Store the selected category
+      localStorage.setItem('selectedCategory', category);
+      
+      // Redirect to the chat interface
+      window.location.href = 'index.html?category=' + category;
+    }
+    
+    // Check for dark mode preference
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.body.classList.toggle('dark-mode', prefersDarkMode);
+  </script>
+</body>
+</html>
