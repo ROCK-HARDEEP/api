@@ -41,28 +41,28 @@ except Exception as e:
 # Store chat sessions in memory (consider persistent storage for production)
 chat_sessions = {}
 
-# Assistant Categories - Improved System Prompts for Accuracy
+# Assistant Categories - Updated System Prompts with RMH as developer
 ASSISTANT_CATEGORIES = {
     "general": {
         "name": "General Assistant",
-        "system_prompt": """You are RM, a helpful, knowledgeable, and versatile AI assistant. When asked about your identity, mention that you are RM, created by a team of developers. Aim to provide balanced, accurate, and thoughtful responses to a wide range of questions and topics."""
+        "system_prompt": """You are IND ChatAI, a helpful, knowledgeable, and versatile AI assistant. When asked about your identity, mention that you are IND ChatAI, developed by RMH at Scube Innovation. Aim to provide balanced, accurate, and thoughtful responses to a wide range of questions and topics."""
     },
     "math": {
         "name": "Math Expert",
-        "system_prompt": """You are RM's Math Expert mode. Your primary role is to answer mathematical questions with accuracy and precision.  Provide step-by-step solutions to math problems whenever possible, showing your work clearly.  Ensure your calculations and reasoning are correct. If a user asks anything unrelated to mathematics, politely suggest they switch to a different mode or clarify that you are specialized in math."""
+        "system_prompt": """You are IND ChatAI's Math Expert mode, developed by RMH at Scube Innovation. Your primary role is to answer mathematical questions with accuracy and precision. Provide step-by-step solutions to math problems whenever possible, showing your work clearly. Ensure your calculations and reasoning are correct. If a user asks anything unrelated to mathematics, politely suggest they switch to a different mode or clarify that you are specialized in math."""
     },
     "coding": {
         "name": "Code Assistant",
-        "system_prompt": """You are RM's Coding Assistant mode.  Focus on providing clean, efficient, and functional code solutions. Accuracy and best practices in coding are paramount.  Always format your code snippets using markdown code blocks with the appropriate language specified. For example, use ```python for Python code, ```javascript for JavaScript code, etc. Make sure code is well-commented, follows industry standards, and offers explanations of the logic."""
+        "system_prompt": """You are IND ChatAI's Coding Assistant mode, developed by RMH at Scube Innovation. Focus on providing clean, efficient, and functional code solutions. Accuracy and best practices in coding are paramount. Always format your code snippets using markdown code blocks with the appropriate language specified. For example, use ```python for Python code, ```javascript for JavaScript code, etc. Make sure code is well-commented, follows industry standards, and offers explanations of the logic."""
     },
     "philosophy": {
         "name": "Deep Thinker",
-        "system_prompt": """You are RM's Deep Thinking mode. Engage with philosophical, ethical, and conceptual questions in a profound and analytical manner. Provide thoughtful analyses, exploring multiple perspectives, and considering nuances. Focus on depth and insight in your responses."""
+        "system_prompt": """You are IND ChatAI's Deep Thinking mode, developed by RMH at Scube Innovation. Engage with philosophical, ethical, and conceptual questions in a profound and analytical manner. Provide thoughtful analyses, exploring multiple perspectives, and considering nuances. Focus on depth and insight in your responses."""
     }
 }
 
 
-# Custom RM responses - Jokes list kept, Identity removed to be handled by Gemini
+# Custom responses for identity and company questions
 RM_RESPONSES = {
     "tell me a joke": "Why did the scarecrow win an award? Because he was outstanding in his field!"
 }
@@ -150,9 +150,11 @@ def custom_response(user_input):
     if "model" in lower_input or "name" in lower_input:
         return "IND ChatAI"
     elif "company" in lower_input:
-        return "Scube"
-    elif "who developed you" in lower_input:
-        return "I was developed by Scube."
+        return "Scube Innovation"
+    elif "who developed you" in lower_input or "who created you" in lower_input or "your developer" in lower_input or "who made you" in lower_input:
+        return "I was developed by RMH at Scube Innovation."
+    elif "who is rmh" in lower_input:
+        return "RMH is my developer at Scube Innovation."
     return None
 
 @app.route("/chat", methods=["POST"])
@@ -216,6 +218,53 @@ def stream_message(session_id):
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
 
+    # Check for custom responses first
+    custom_reply = custom_response(user_message)
+    if custom_reply:
+        message_id = str(uuid.uuid4())
+        
+        # Add user message to session
+        user_msg = {
+            "id": str(uuid.uuid4()),
+            "role": "user",
+            "content": user_message,
+            "timestamp": datetime.now().isoformat()
+        }
+        chat_sessions[session_id]["messages"].append(user_msg)
+        
+        # Add assistant response to session
+        assistant_msg = {
+            "id": message_id,
+            "role": "assistant",
+            "content": custom_reply,
+            "timestamp": datetime.now().isoformat(),
+            "category": chat_sessions[session_id].get("category", "general")
+        }
+        chat_sessions[session_id]["messages"].append(assistant_msg)
+        
+        def generate_custom():
+            metadata = {
+                "id": message_id,
+                "role": "assistant",
+                "category": chat_sessions[session_id].get("category", "general"),
+                "timestamp": datetime.now().isoformat(),
+                "status": "streaming"
+            }
+            yield f"data: {json.dumps(metadata)}\n\n"
+            
+            data = {
+                "id": message_id,
+                "chunk": custom_reply,
+                "position": 0,
+                "code_block": False
+            }
+            yield f"data: {json.dumps(data)}\n\n"
+            
+            complete_data = {"id": message_id, "status": "complete", "final_content": custom_reply}
+            yield f"data: {json.dumps(complete_data)}\n\n"
+        
+        return Response(generate_custom(), mimetype='text/event-stream')
+
     category = data.get('category')
     if category:
         if category not in ASSISTANT_CATEGORIES:
@@ -248,7 +297,7 @@ def stream_message(session_id):
         yield f"data: {json.dumps(metadata)}\n\n"  # Initial metadata chunk
 
 
-        try:  # Handle Gemini API call - Custom responses removed for Identity Questions - Let Gemini Handle.
+        try:  # Handle Gemini API call
             system_prompt = ASSISTANT_CATEGORIES[category]["system_prompt"]  # Get category prompt
 
             # Formatting instructions based on category (example: coding, math)
@@ -259,7 +308,7 @@ def stream_message(session_id):
 
             chat_history = [  # Prepare chat history for Gemini API
                 {"role": "user", "parts": [system_prompt]},
-                {"role": "model", "parts": ["I understand I am RM, and I'll respond accordingly."]}  # Initial bot acknowledgement
+                {"role": "model", "parts": ["I understand I am IND ChatAI, developed by RMH at Scube Innovation, and I'll respond accordingly."]}  # Updated initial bot acknowledgement
             ]
 
             for msg in chat_sessions[session_id]["messages"][:-1]:  # Add previous messages (except last user msg)
@@ -344,6 +393,36 @@ def send_message(session_id):
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
 
+    # Check for custom responses first
+    custom_reply = custom_response(user_message)
+    if custom_reply:
+        message_id = str(uuid.uuid4())
+        
+        # Add user message to session
+        user_msg = {
+            "id": str(uuid.uuid4()),
+            "role": "user",
+            "content": user_message,
+            "timestamp": datetime.now().isoformat()
+        }
+        chat_sessions[session_id]["messages"].append(user_msg)
+        
+        # Add assistant response to session
+        assistant_msg = {
+            "id": message_id,
+            "role": "assistant",
+            "content": custom_reply,
+            "timestamp": datetime.now().isoformat(),
+            "category": chat_sessions[session_id].get("category", "general")
+        }
+        chat_sessions[session_id]["messages"].append(assistant_msg)
+        
+        return jsonify({
+            "id": assistant_msg["id"],
+            "content": assistant_msg["content"],
+            "category": chat_sessions[session_id].get("category", "general")
+        })
+
     category = data.get('category')
     if category:
         if category not in ASSISTANT_CATEGORIES:
@@ -373,7 +452,7 @@ def send_message(session_id):
 
         chat_history = [  # History prep - same as streaming version but no streaming
             {"role": "user", "parts": [system_prompt]},
-            {"role": "model", "parts": ["I understand I am RM, and I'll respond accordingly."]}
+            {"role": "model", "parts": ["I understand I am IND ChatAI, developed by RMH at Scube Innovation, and I'll respond accordingly."]}  # Updated bot acknowledgement
         ]
         for msg in chat_sessions[session_id]["messages"][:-1]:  # Previous messages
             if msg["role"] == "user":
