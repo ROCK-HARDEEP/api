@@ -190,53 +190,6 @@ def stream_message(session_id):
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
 
-    # Check for custom responses first
-    custom_reply = custom_response(user_message)
-    if custom_reply:
-        message_id = str(uuid.uuid4())
-        
-        # Add user message to session
-        user_msg = {
-            "id": str(uuid.uuid4()),
-            "role": "user",
-            "content": user_message,
-            "timestamp": datetime.now().isoformat()
-        }
-        chat_sessions[session_id]["messages"].append(user_msg)
-        
-        # Add assistant response to session
-        assistant_msg = {
-            "id": message_id,
-            "role": "assistant",
-            "content": custom_reply,
-            "timestamp": datetime.now().isoformat(),
-            "category": chat_sessions[session_id].get("category", "general")
-        }
-        chat_sessions[session_id]["messages"].append(assistant_msg)
-        
-        def generate_custom():
-            metadata = {
-                "id": message_id,
-                "role": "assistant",
-                "category": chat_sessions[session_id].get("category", "general"),
-                "timestamp": datetime.now().isoformat(),
-                "status": "streaming"
-            }
-            yield f"data: {json.dumps(metadata)}\n\n"
-            
-            data = {
-                "id": message_id,
-                "chunk": custom_reply,
-                "position": 0,
-                "code_block": False
-            }
-            yield f"data: {json.dumps(data)}\n\n"
-            
-            complete_data = {"id": message_id, "status": "complete", "final_content": custom_reply}
-            yield f"data: {json.dumps(complete_data)}\n\n"
-        
-        return Response(generate_custom(), mimetype='text/event-stream')
-
     category = data.get('category')
     if category:
         if category not in ASSISTANT_CATEGORIES:
@@ -364,36 +317,6 @@ def send_message(session_id):
     user_message = data.get('message', '')
     if not user_message:
         return jsonify({"error": "No message provided"}), 400
-
-    # Check for custom responses first
-    custom_reply = custom_response(user_message)
-    if custom_reply:
-        message_id = str(uuid.uuid4())
-        
-        # Add user message to session
-        user_msg = {
-            "id": str(uuid.uuid4()),
-            "role": "user",
-            "content": user_message,
-            "timestamp": datetime.now().isoformat()
-        }
-        chat_sessions[session_id]["messages"].append(user_msg)
-        
-        # Add assistant response to session
-        assistant_msg = {
-            "id": message_id,
-            "role": "assistant",
-            "content": custom_reply,
-            "timestamp": datetime.now().isoformat(),
-            "category": chat_sessions[session_id].get("category", "general")
-        }
-        chat_sessions[session_id]["messages"].append(assistant_msg)
-        
-        return jsonify({
-            "id": assistant_msg["id"],
-            "content": assistant_msg["content"],
-            "category": chat_sessions[session_id].get("category", "general")
-        })
 
     category = data.get('category')
     if category:
