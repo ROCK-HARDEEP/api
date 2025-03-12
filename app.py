@@ -146,7 +146,7 @@ def format_streaming_chunk(chunk, category):
     return chunk
 
 # --- Routes ---
-@app.route('/', defaults={'path': 'index.html'})
+@app.route('/', defaults={'path': 'intro.html'})
 @app.route('/<path:path>')
 def serve_static(path):
     """Serve static files from the 'static' directory."""
