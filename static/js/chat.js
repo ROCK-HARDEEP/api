@@ -78,13 +78,14 @@ class ChatManager {
   }
 
   getCategoryIcon(category) {
-      switch (category) {
-          case 'math': return 'fas fa-calculator';
-          case 'coding': return 'fas fa-code';
-          case 'philosophy': return 'fas fa-brain';
-          default: return 'fas fa-robot';
-      }
-  }
+    // Return image paths instead of Font Awesome classes
+    switch (category) {
+        case 'math': return '<img src="/static/img/wlcopy.png" alt="Math Expert" class="category-icon">';
+        case 'coding': return '<img src="static/img/wlcopy.png" alt="Code Assistant" class="category-icon">';
+        case 'philosophy': return '<img src="static/img/wlcopy.png" alt="Deep Thinker" class="category-icon">';
+        default: return '<img src="static/img/wlcopy.png" alt="General Assistant" class="category-icon">';
+    }
+}
 
   async loadChatHistory() {
       try {
@@ -126,14 +127,15 @@ class ChatManager {
                   li.classList.add(`category-${chat.category}`);
               }
               const categoryIcon = this.getCategoryIcon(chat.category || 'general');
+              
               li.innerHTML = `
-      <div class="conversation-title">
-        <i class="${categoryIcon}"></i> ${chat.title}
-      </div>
-      <button class="delete-chat-btn" data-id="${chat.id}">
-        <i class="fas fa-trash"></i>
-      </button>
-    `;
+                    <div class="conversation-title">
+                    ${categoryIcon} ${chat.title}
+                    </div>
+                    <button class="delete-chat-btn" data-id="${chat.id}">
+                    <i class="fas fa-trash"></i>
+                    </button>
+                    `;
               li.addEventListener('click', (e) => {
                   if (!e.target.closest('.delete-chat-btn')) {
                       this.switchConversation(chat.id);
@@ -235,12 +237,13 @@ class ChatManager {
   addBotMessage(message, category = 'general') {
       const messageNode = this.botMessageTemplate.content.cloneNode(true);
       const messageElement = messageNode.querySelector('.message');
-      const messageAvatar = messageNode.querySelector('.message-avatar i');
+      const messageAvatar = messageNode.querySelector('.message-avatar');
       const messageText = messageNode.querySelector('.message-text');
       const codeDisplayArea = messageNode.querySelector('.code-display-area'); // Get codeDisplayArea
       const messageSource = messageNode.querySelector('.message-source');
       const messageFooter = messageNode.querySelector('.message-footer');
 
+      messageAvatar.innerHTML = this.getCategoryIcon(category);
       messageElement.classList.add(`category-${category}`);
       messageAvatar.className = this.getCategoryIcon(category);
 
@@ -327,10 +330,11 @@ class ChatManager {
   addStreamingBotMessage() {
       const messageNode = this.botMessageTemplate.content.cloneNode(true);
       const messageElement = messageNode.querySelector('.message');
-      const messageAvatar = messageNode.querySelector('.message-avatar i');
+      const messageAvatar = messageNode.querySelector('.message-avatar');
       const messageText = messageNode.querySelector('.message-text');
       const codeDisplayArea = messageNode.querySelector('.code-display-area'); // Get codeDisplayArea
 
+      messageAvatar.innerHTML = this.getCategoryIcon(this.currentCategory);
       messageElement.classList.add(`category-${this.currentCategory}`, 'streaming-message');
       messageAvatar.className = this.getCategoryIcon(this.currentCategory);
       messageText.innerHTML = '<span class="cursor"></span>'; // Cursor in text area
