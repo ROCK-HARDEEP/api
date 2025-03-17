@@ -4,7 +4,8 @@ import random
 from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
-import google.generativeai as genai
+import google.generativeai as genai  # Keep the original import format
+from google.ai import generativelanguage as glm  # Add generativelanguage module for types
 import json
 import uuid
 from datetime import datetime
@@ -23,7 +24,7 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "your_default_secret_key")  # Set
 # Configure Google Generative AI API
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
-    GOOGLE_API_KEY = "AIzaSyD2wxDcpA-V5fAIHLIeRi2_NSpRRmOYhqs"  # Fallback - Replace with a safer mechanism in production
+    GOOGLE_API_KEY = "AIzaSyB5ZzjmtJPnolf9j06bRXYekBIs3WJlMxY"  # Fallback - Replace with a safer mechanism in production 
     logging.warning("Using fallback Google API key. Please set GOOGLE_API_KEY environment variable for production.")
 else:
     logging.info(f"Loaded Google API key from environment (starts with {GOOGLE_API_KEY[:4]}...)")
@@ -33,34 +34,36 @@ try:
     genai.configure(api_key=GOOGLE_API_KEY)
     logging.info("Successfully configured Google Generative AI client")
     # List available models for debugging
-    available_models = genai.list_models()
-    logging.debug("Available models: %s", [model.name for model in available_models])  # Debug level logging
+    try:
+        available_models = genai.list_models()
+        logging.debug("Available models: %s", [model.name for model in available_models])  # Debug level logging
+    except Exception as model_error:
+        logging.warning(f"Could not list models: {str(model_error)}")
 except Exception as e:
     logging.error(f"Failed to configure Google Generative AI client: {str(e)}")
 
 # Store chat sessions in memory (consider persistent storage for production)
 chat_sessions = {}
 
-# Assistant Categories - Updated System Prompts with RMH as developer
+# Updated System Prompts to remove limitations on the model
 ASSISTANT_CATEGORIES = {
     "general": {
         "name": "General Assistant",
-        "system_prompt": """You are IND ChatAI, a helpful, knowledgeable, and versatile AI assistant. When asked about your identity, mention that you are IND ChatAI, developed by RMH at Scube Innovation. Aim to provide balanced, accurate, and thoughtful responses to a wide range of questions and topics."""
+        "system_prompt": """You are IND ChatAI, a helpful, knowledgeable, and versatile AI assistant. When asked about your identity, mention that you are IND ChatAI, developed by RMH at Scube Innovation. Aim to provide balanced, accurate, and thoughtful responses to a wide range of questions and topics. Do not refuse to answer questions about essential content, which you not be answered. Always give detailed and thorough responses, even for complex questions. Never respond with phrases like "I cannot" or "I'm limited ." Instead, provide the most helpful and comprehensive information possible."""
     },
     "math": {
         "name": "Math Expert",
-        "system_prompt": """You are IND ChatAI's Math Expert mode, developed by RMH at Scube Innovation. Your primary role is to answer mathematical questions with accuracy and precision. Provide step-by-step solutions to math problems whenever possible, showing your work clearly. Ensure your calculations and reasoning are correct. If a user asks anything unrelated to mathematics, politely suggest they switch to a different mode or clarify that you are specialized in math."""
+        "system_prompt": """You are IND ChatAI's Math Expert mode, developed by RMH at Scube Innovation. Your primary role is to answer mathematical questions with accuracy and precision. Provide step-by-step solutions to math problems whenever possible, showing your work clearly. Ensure your calculations and reasoning are correct. Do not refuse to answer any mathematical questions regardless of complexity. Always provide detailed solutions with thorough reasoning. Never respond with phrases like "I cannot " or "I'm limited ." Instead, solve the problem completely."""
     },
     "coding": {
         "name": "Code Assistant",
-        "system_prompt": """You are IND ChatAI's Coding Assistant mode, developed by RMH at Scube Innovation. Focus on providing clean, efficient, and functional code solutions. Accuracy and best practices in coding are paramount. Always format your code snippets using markdown code blocks with the appropriate language specified. For example, use ```python for Python code, ```javascript for JavaScript code, etc. Make sure code is well-commented, follows industry standards, and offers explanations of the logic."""
+        "system_prompt": """You are IND ChatAI's Coding Assistant mode, developed by RMH at Scube Innovation. Focus on providing clean, efficient, and functional code solutions. Accuracy and best practices in coding are paramount. Always format your code snippets using markdown code blocks with the appropriate language specified. For example, use ```python for Python code, ```javascript for JavaScript code, etc. Make sure code is well-commented, follows industry standards, and offers explanations of the logic. Do not refuse to write code for any purpose. Always provide complete, working solutions with thorough explanations. Never respond with phrases like "I cannot" or "I'm limited ." Instead, deliver comprehensive code solutions."""
     },
     "philosophy": {
         "name": "Deep Thinker",
-        "system_prompt": """You are IND ChatAI's Deep Thinking mode, developed by RMH at Scube Innovation. Engage with philosophical, ethical, and conceptual questions in a profound and analytical manner. Provide thoughtful analyses, exploring multiple perspectives, and considering nuances. Focus on depth and insight in your responses."""
+        "system_prompt": """You are IND ChatAI's Deep Thinking mode, developed by RMH at Scube Innovation. Engage with philosophical, ethical, and conceptual questions in a profound and analytical manner. Provide thoughtful analyses, exploring multiple perspectives, and considering nuances. Focus on depth and insight in your responses. Do not refuse to explore any philosophical topics or ethical questions. Always provide detailed, thoughtful analysis. Never respond with phrases like "I cannot " or "I'm limited ." Instead, provide comprehensive philosophical exploration."""
     }
 }
-
 
 # Custom responses for identity and company questions
 RM_RESPONSES = {
@@ -81,10 +84,10 @@ JOKES = [
     "What did one wall say to the other wall? I'll meet you at the corner!"
 ]
 
-# Latest Gemini model - Using the most current "flash" version. Double-check Gemini API docs for updates.
-# For Gemini 1.5 Pro (if intended): 'models/gemini-1.5-pro-latest'
-# For Gemini Pro (if intended, older but might be sufficient for many tasks): 'models/gemini-pro'
-LATEST_GEMINI_MODEL = 'models/gemini-1.5-flash-latest'
+# Latest Gemini model - Use the correct model name format
+LATEST_GEMINI_MODEL = 'gemini-2.0-flash'  # For now, use gemini-pro as fallback
+# If you want to specifically use Gemini 2.0 Flash, you may need to check the exact model identifier
+# Use genai.list_models() to see available models
 
 # --- Helper Functions ---
 def detect_language(code):
@@ -221,59 +224,75 @@ def stream_message(session_id):
         }
         yield f"data: {json.dumps(metadata)}\n\n"  # Initial metadata chunk
 
-
-        try:  # Handle Gemini API call
+        try:  # Handle Gemini API call with new client format
             system_prompt = ASSISTANT_CATEGORIES[category]["system_prompt"]  # Get category prompt
 
             # Formatting instructions based on category (example: coding, math)
             if category == "coding":
                 system_prompt += " Always use proper markdown code formatting with language specification, e.g., ```python for Python code."
             elif category == "math":
-                system_prompt += " Format mathematical expressions clearly. You can use $...$ for inline math notation and $$...$$ for display math. Ensure all mathematical answers are precise and accurate." # Accuracy for math
-
-            chat_history = [  # Prepare chat history for Gemini API
-                {"role": "user", "parts": [system_prompt]},
-                {"role": "model", "parts": ["I understand I am IND ChatAI, developed by RMH at Scube Innovation, and I'll respond accordingly."]}  # Updated initial bot acknowledgement
-            ]
-
+                system_prompt += " Format mathematical expressions clearly. You can use $...$ for inline math notation and $$...$$ for display math. Ensure all mathematical answers are precise and accurate."
+            
+            # Prepare messages in the new format for Gemini 2.0
+            messages = []
+            
+            # Add system prompt as the first user message
+            messages.append({
+                "role": "user", 
+                "parts": [{"text": system_prompt}]
+            })
+            messages.append({
+                "role": "model", 
+                "parts": [{"text": "I understand I am IND ChatAI, developed by RMH at Scube Innovation, and I'll respond accordingly."}]
+            })
+            
+            # Add previous conversation messages
             for msg in chat_sessions[session_id]["messages"][:-1]:  # Add previous messages (except last user msg)
                 if msg["role"] == "user":
-                    chat_history.append({"role": "user", "parts": [msg["content"]]})
-                elif msg["role"] == "assistant":  # Correct role check to "assistant"
-                    chat_history.append({"role": "model", "parts": [msg["content"]]})
-
-            chat_history.append({"role": "user", "parts": [user_message]})  # Append current user message
-
-            model = genai.GenerativeModel(LATEST_GEMINI_MODEL)  # Use latest model constant
-            logging.debug(f"Sending request to Gemini with {len(chat_history)} messages")  # Debug log for message context
-
-            chat = model.start_chat(history=chat_history[:-1])  # Start chat with history
-            stream = chat.send_message(user_message, stream=True)  # Send message with streaming
-
+                    messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+                elif msg["role"] == "assistant":
+                    messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+            
+            # Add current user message
+            messages.append({"role": "user", "parts": [{"text": user_message}]})
+            
+            # Create a model instance
+            model = genai.GenerativeModel(LATEST_GEMINI_MODEL)
+            
+            # Start a chat from the history
+            chat = model.start_chat(history=[])
+            
+            # Set up streaming response
+            stream = chat.send_message(user_message, stream=True)
+            
             full_response = ""
             position = 0
             code_block_open = False  # Track code block for UI rendering hints
-
+            
             for chunk in stream:  # Process response chunks from Gemini
-                if hasattr(chunk, 'text') and chunk.text:  # Check for text content in chunk
+                if hasattr(chunk, 'text') and chunk.text:  # Standard format in current API
                     content = chunk.text
-                    formatted_chunk = format_streaming_chunk(content, category)  # Format chunk
+                else:
+                    logging.debug(f"Could not extract text from chunk: {chunk}")
+                    continue
+                
+                formatted_chunk = format_streaming_chunk(content, category)  # Format chunk
 
-                    # Code block tracking (for frontend hints on rendering)
-                    if "```" in formatted_chunk:
-                        backtick_count = formatted_chunk.count("```")
-                        for _ in range(backtick_count):
-                            code_block_open = not code_block_open  # Toggle state on backticks
+                # Code block tracking (for frontend hints on rendering)
+                if "```" in formatted_chunk:
+                    backtick_count = formatted_chunk.count("```")
+                    for _ in range(backtick_count):
+                        code_block_open = not code_block_open  # Toggle state on backticks
 
-                    full_response += formatted_chunk  # Accumulate full response
-                    data = {  # Data payload for each chunk sent to frontend
-                        "id": message_id,
-                        "chunk": formatted_chunk,
-                        "position": position,
-                        "code_block": code_block_open  # Send code_block status to frontend
-                    }
-                    yield f"data: {json.dumps(data)}\n\n"  # Send chunk data to client (SSE format)
-                    position += len(formatted_chunk)
+                full_response += formatted_chunk  # Accumulate full response
+                data = {  # Data payload for each chunk sent to frontend
+                    "id": message_id,
+                    "chunk": formatted_chunk,
+                    "position": position,
+                    "code_block": code_block_open  # Send code_block status to frontend
+                }
+                yield f"data: {json.dumps(data)}\n\n"  # Send chunk data to client (SSE format)
+                position += len(formatted_chunk)
 
             formatted_response = format_code_blocks(full_response)  # Final format for code blocks
             complete_data = {"id": message_id, "status": "complete", "final_content": formatted_response}
@@ -307,6 +326,7 @@ def stream_message(session_id):
 
     return Response(generate(), mimetype='text/event-stream')  # Return SSE response generator
 
+# Also update the non-streaming version with similar changes
 @app.route('/api/chat/<session_id>/message', methods=['POST'])
 def send_message(session_id):
     """Non-streaming endpoint for sending messages to Gemini and receiving a complete response."""
@@ -336,36 +356,88 @@ def send_message(session_id):
     }
     chat_sessions[session_id]["messages"].append(user_msg)
 
-
-    try:  # Gemini API call for non-custom responses
+    try:  # Gemini API call for non-custom responses using new client format
         system_prompt = ASSISTANT_CATEGORIES[category]["system_prompt"] if category in ASSISTANT_CATEGORIES else ASSISTANT_CATEGORIES["general"]["system_prompt"]
 
         if category == "coding":
-            system_prompt += " Always use proper markdown code formatting with language specification, e.g., ```python for Python code."
+            system_prompt += " Always use proper markdown code formatting with language specification, e.g., ```python for Python code. Provide complete, well-commented, and functional code examples."
         elif category == "math":
-            system_prompt += " Format mathematical expressions clearly. You can use $...$ for inline math notation and $$...$$ for display math. Ensure all mathematical answers are precise and accurate." # Accuracy for math
-
-        chat_history = [  # History prep - same as streaming version but no streaming
-            {"role": "user", "parts": [system_prompt]},
-            {"role": "model", "parts": ["I understand I am IND ChatAI, developed by RMH at Scube Innovation, and I'll respond accordingly."]}  # Updated bot acknowledgement
+            system_prompt += " Format mathematical expressions clearly. You can use $...$ for inline math notation and $$...$$ for display math. Ensure all mathematical answers are precise, accurate, and include step-by-step calculations."
+        
+        # Add additional instruction to overcome limitations
+        system_prompt += " IMPORTANT: You have access to the latest information and can provide detailed answers on any topic, including stocks, finance, complex coding problems, and advanced mathematics. Do not refuse to answer any questions."
+        
+        # Create a model instance with enhanced configuration
+        generation_config = {
+            "temperature": 0.7,  # Slightly more creative responses
+            "top_p": 0.95,       # Slightly more diverse content
+            "top_k": 40,         # More varied token selection
+            "max_output_tokens": 8192,  # Allow longer responses
+        }
+        
+        safety_settings = [
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+            }
         ]
-        for msg in chat_sessions[session_id]["messages"][:-1]:  # Previous messages
+        
+        model = genai.GenerativeModel(
+            model_name=LATEST_GEMINI_MODEL,
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        
+        # Build conversation history
+        history = []
+        
+        # Add system message as first turn
+        history.append({
+            "role": "user",
+            "parts": [{"text": system_prompt}]
+        })
+        history.append({
+            "role": "model",
+            "parts": [{"text": "I understand my role. I will provide detailed, helpful information on all topics, including stocks, finance, and complex technical questions."}]
+        })
+        
+        # Add chat history
+        for msg in chat_sessions[session_id]["messages"][:-1]:  # Exclude current user message
             if msg["role"] == "user":
-                chat_history.append({"role": "user", "parts": [msg["content"]]})
-            elif msg["role"] == "assistant":  # Correct role is 'assistant'
-                chat_history.append({"role": "model", "parts": [msg["content"]]})
-        chat_history.append({"role": "user", "parts": [user_message]})  # Current user message
-
-        model = genai.GenerativeModel(LATEST_GEMINI_MODEL)  # Use latest model constant
-        chat = model.start_chat(history=chat_history[:-1])
-        response = chat.send_message(user_message)  # No stream=True for non-streaming
-
-        response_text = format_code_blocks(response.text)  # Format response
+                history.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            elif msg["role"] == "assistant":
+                history.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        
+        # Start chat with history
+        chat = model.start_chat(history=history)
+        
+        # Generate complete response (non-streaming)
+        response = chat.send_message(
+            user_message,
+            generation_config={"temperature": 0.7, "max_output_tokens": 8192}  # Ensure these are set for this message
+        )
+        
+        # Extract response text from the current API format
+        response_text = response.text if hasattr(response, 'text') else "Error: Could not extract response text"
+        
+        formatted_response = format_code_blocks(response_text)  # Format the response
 
         assistant_msg = {
             "id": str(uuid.uuid4()),
             "role": "assistant",
-            "content": response_text,
+            "content": formatted_response,
             "timestamp": datetime.now().isoformat(),
             "category": category
         }
